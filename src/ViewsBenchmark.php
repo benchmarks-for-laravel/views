@@ -7,6 +7,7 @@ use BenchmarksForLaravel\Toolbox\Benchmark\UpdateType;
 use Closure;
 use Illuminate\Support\Benchmark as SupportBenchmark;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\View;
 
 class ViewsBenchmark extends Benchmark
 {
@@ -17,37 +18,44 @@ class ViewsBenchmark extends Benchmark
 
     public function run(Closure $onUpdate): void
     {
-        Artisan::call('view:clear');
-
         $this->welcome($onUpdate);
         $this->accounts($onUpdate);
+        $this->messages($onUpdate);
+
+        $this->clearCache();
 
         $onUpdate($this->update(UpdateType::Done));
     }
 
     private function welcome(Closure $onUpdate): void
     {
-        $group = 'Welcome page with layout component';
+        $group = 'Welcome page in a single layout component';
 
         $onUpdate(
             $this->update(
                 type: UpdateType::Measurement,
                 group: $group,
-                description: 'Warming',
+                description: 'Without file cache',
                 measurement: SupportBenchmark::measure(
-                    benchmarkables: fn() => view('benchmarks-for-laravel-views::welcome')->render()
+                    benchmarkables: function() {
+                        $this->clearCache();
+                        $this->renderView('welcome');
+                    },
                 ),
             ),
         );
 
+        // make sure view is cached
+        $this->renderView('welcome');
+
         $onUpdate(
             $this->update(
                 type: UpdateType::Measurement,
                 group: $group,
-                description: 'Measuring',
+                description: 'With file cache',
                 measurement: SupportBenchmark::measure(
-                    benchmarkables: fn() => view('benchmarks-for-laravel-views::welcome')->render(),
-                    iterations: 10,
+                    benchmarkables: fn() => $this->renderView('welcome'),
+                    iterations: ViewsServiceProvider::$benchmarkIterations,
                 ),
             ),
         );
@@ -55,29 +63,80 @@ class ViewsBenchmark extends Benchmark
 
     private function accounts(Closure $onUpdate): void
     {
-        $group = 'Account list (1000 avatars) with layout component';
+        $group = 'Account list ('.ViewsServiceProvider::$loopIterations.' anonymous components)';
 
         $onUpdate(
             $this->update(
                 type: UpdateType::Measurement,
                 group: $group,
-                description: 'Warming',
+                description: 'Without file cache',
                 measurement: SupportBenchmark::measure(
-                    benchmarkables: fn() => view('benchmarks-for-laravel-views::accounts')->render(),
+                    benchmarkables: function() {
+                        $this->clearCache();
+                        $this->renderView('accounts');
+                    },
+                    iterations: ViewsServiceProvider::$benchmarkIterations,
                 ),
             ),
         );
+
+        // make sure view is cached
+        $this->renderView('accounts');
 
         $onUpdate(
             $this->update(
                 type: UpdateType::Measurement,
                 group: $group,
-                description: 'Measuring',
+                description: 'With file cache',
                 measurement: SupportBenchmark::measure(
-                    benchmarkables: fn() => view('benchmarks-for-laravel-views::accounts')->render(),
-                    iterations: 10,
+                    benchmarkables: fn() => $this->renderView('accounts'),
+                    iterations: ViewsServiceProvider::$benchmarkIterations,
                 ),
             ),
         );
+    }
+
+    private function messages(Closure $onUpdate): void
+    {
+        $group = 'Message list ('.ViewsServiceProvider::$loopIterations.' class components)';
+
+        $onUpdate(
+            $this->update(
+                type: UpdateType::Measurement,
+                group: $group,
+                description: 'Without file cache',
+                measurement: SupportBenchmark::measure(
+                    benchmarkables: function() {
+                        $this->clearCache();
+                        $this->renderView('messages');
+                    },
+                ),
+            ),
+        );
+
+        // make sure view is cached
+        $this->renderView('messages');
+
+        $onUpdate(
+            $this->update(
+                type: UpdateType::Measurement,
+                group: $group,
+                description: 'With file cache',
+                measurement: SupportBenchmark::measure(
+                    benchmarkables: fn() => $this->renderView('messages'),
+                    iterations: ViewsServiceProvider::$benchmarkIterations,
+                ),
+            ),
+        );
+    }
+
+    private function clearCache(): void
+    {
+        Artisan::call('view:clear');
+    }
+
+    private function renderView(string $name): void
+    {
+        View::make(ViewsServiceProvider::$prefix.'::'.$name);
     }
 }
