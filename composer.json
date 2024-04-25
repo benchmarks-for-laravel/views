@@ -1,0 +1,50 @@
+{
+  "name": "benchmarks-for-laravel/views",
+  "description": "Benchmarks for Laravel's view engine",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Christopher Pitt",
+      "email": "me@assertchris.io",
+      "homepage": "https://assertchris.io",
+      "role": "Developer"
+    }
+  ],
+  "homepage": "https://github.com/benchmarks-for-laravel/views",
+  "repositories": [
+    {
+      "type": "path",
+      "url": "../benchmarks-for-laravel-toolbox"
+    }
+  ],
+  "require": {
+    "benchmarks-for-laravel/toolbox": "*",
+    "php": "^8.3",
+    "illuminate/console": "^9.0|^10.0|^11.0",
+    "illuminate/container": "^9.0|^10.0|^11.0",
+    "illuminate/contracts": "^9.0|^10.0|^11.0",
+    "illuminate/support": "^9.0|^10.0|^11.0"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "autoload": {
+    "psr-4": {
+      "BenchmarksForLaravel\\Views\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "BenchmarksForLaravel\\Views\\Tests\\": "tests"
+    }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "BenchmarksForLaravel\\Views\\ViewsServiceProvider"
+      ]
+    }
+  }
+}
