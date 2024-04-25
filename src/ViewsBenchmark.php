@@ -17,13 +17,6 @@ class ViewsBenchmark extends Benchmark
 
     public function run(Closure $onUpdate): void
     {
-        $onUpdate(
-            $this->update(
-                UpdateType::Info,
-                description: 'Benchmarking view engine...',
-            )
-        );
-
         Artisan::call('view:clear');
 
         $this->welcome($onUpdate);
@@ -34,13 +27,13 @@ class ViewsBenchmark extends Benchmark
 
     private function welcome(Closure $onUpdate): void
     {
-        $group = '1. Welcome page with layout component';
+        $group = 'Welcome page with layout component';
 
         $onUpdate(
             $this->update(
                 type: UpdateType::Measurement,
                 group: $group,
-                description: '- Warming',
+                description: 'Warming',
                 measurement: SupportBenchmark::measure(
                     benchmarkables: fn() => view('benchmarks-for-laravel-views::welcome')->render()
                 ),
@@ -51,7 +44,7 @@ class ViewsBenchmark extends Benchmark
             $this->update(
                 type: UpdateType::Measurement,
                 group: $group,
-                description: '- Measuring',
+                description: 'Measuring',
                 measurement: SupportBenchmark::measure(
                     benchmarkables: fn() => view('benchmarks-for-laravel-views::welcome')->render(),
                     iterations: 10,
@@ -62,13 +55,13 @@ class ViewsBenchmark extends Benchmark
 
     private function accounts(Closure $onUpdate): void
     {
-        $group = '2. Account list (1000 avatars) with layout component';
+        $group = 'Account list (1000 avatars) with layout component';
 
         $onUpdate(
             $this->update(
                 type: UpdateType::Measurement,
                 group: $group,
-                description: '- Warming',
+                description: 'Warming',
                 measurement: SupportBenchmark::measure(
                     benchmarkables: fn() => view('benchmarks-for-laravel-views::accounts')->render(),
                 ),
@@ -79,7 +72,7 @@ class ViewsBenchmark extends Benchmark
             $this->update(
                 type: UpdateType::Measurement,
                 group: $group,
-                description: '- Measuring',
+                description: 'Measuring',
                 measurement: SupportBenchmark::measure(
                     benchmarkables: fn() => view('benchmarks-for-laravel-views::accounts')->render(),
                     iterations: 10,
